@@ -1,11 +1,13 @@
 <script setup lang="ts">
-import { computed, ref, type Component } from 'vue'
+import { computed, onMounted, ref, type Component } from 'vue'
 import HomeView from './views/HomeView.vue'
 import MembersView from './views/MembersView.vue'
 import MedicinesView from './views/MedicinesView.vue'
 import MedicationView from './views/MedicationView.vue'
 import RecordsView from './views/RecordsView.vue'
 import ProfileView from './views/ProfileView.vue'
+import ReminderToasts from './components/medication/ReminderToasts.vue'
+import { useReminders } from './utils/reminders'
 
 type ViewName = 'home' | 'members' | 'medicines' | 'medication' | 'records' | 'profile'
 
@@ -29,6 +31,17 @@ const views: Record<ViewName, Component> = {
 
 const currentView = ref<ViewName>('home')
 const activeView = computed(() => views[currentView.value])
+
+const { start } = useReminders()
+
+onMounted(() => {
+  // Begin checking for due medication doses (notifications + in-app fallback).
+  start()
+})
+
+function goToMedication() {
+  currentView.value = 'medication'
+}
 </script>
 
 <template>
@@ -55,6 +68,9 @@ const activeView = computed(() => views[currentView.value])
     <main class="main">
       <component :is="activeView" />
     </main>
+
+    <!-- Due-dose reminders (in-app toasts; also shown alongside browser notifications) -->
+    <ReminderToasts @navigate="goToMedication" />
   </div>
 </template>
 

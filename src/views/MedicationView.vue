@@ -2,6 +2,7 @@
 import { computed, ref } from 'vue'
 import DoseItem from '../components/medication/DoseItem.vue'
 import PlanForm from '../components/medication/PlanForm.vue'
+import NotificationSettings from '../components/medication/NotificationSettings.vue'
 import BaseModal from '../components/ui/BaseModal.vue'
 import EmptyState from '../components/ui/EmptyState.vue'
 import { useFamilyStore } from '../stores/useFamilyStore'
@@ -41,6 +42,9 @@ function onDelete(plan: MedicationPlan) {
       <h1 class="page-title">用药提醒</h1>
       <button type="button" class="btn btn-primary" @click="showForm = true">＋ 新建用药计划</button>
     </div>
+
+    <!-- Notification permission & fallback -->
+    <NotificationSettings />
 
     <!-- Compliance -->
     <section class="card compliance-card">
