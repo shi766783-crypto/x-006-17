@@ -1,15 +1,18 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue'
 import DoseItem from '../components/medication/DoseItem.vue'
+import NotificationSettings from '../components/medication/NotificationSettings.vue'
 import PlanForm from '../components/medication/PlanForm.vue'
 import BaseModal from '../components/ui/BaseModal.vue'
 import EmptyState from '../components/ui/EmptyState.vue'
+import { useNotifications } from '../composables/useNotifications'
 import { useFamilyStore } from '../stores/useFamilyStore'
 import type { MedicationPlan } from '../types'
 import { formatDate } from '../utils/date'
 import { formatPercent } from '../utils/format'
 
 const store = useFamilyStore()
+const { permission, requestPermission } = useNotifications()
 const showForm = ref(false)
 
 const todayDoses = computed(() => store.todayDoses)
@@ -23,9 +26,14 @@ function medicineName(plan: MedicationPlan) {
   return store.getMedicine(plan.medicineId)?.name ?? '—'
 }
 
-function onSave(data: Omit<MedicationPlan, 'id'>) {
+async function onSave(data: Omit<MedicationPlan, 'id'>) {
   store.addPlan(data)
   showForm.value = false
+  // First-time setup: ask for notification permission while still in the
+  // user's click gesture, so the browser allows the prompt.
+  if (permission.value === 'default') {
+    await requestPermission()
+  }
 }
 
 function onDelete(plan: MedicationPlan) {
@@ -41,6 +49,9 @@ function onDelete(plan: MedicationPlan) {
       <h1 class="page-title">用药提醒</h1>
       <button type="button" class="btn btn-primary" @click="showForm = true">＋ 新建用药计划</button>
     </div>
+
+    <!-- Notification permission / fallback settings -->
+    <NotificationSettings />
 
     <!-- Compliance -->
     <section class="card compliance-card">

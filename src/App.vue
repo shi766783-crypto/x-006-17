@@ -6,6 +6,11 @@ import MedicinesView from './views/MedicinesView.vue'
 import MedicationView from './views/MedicationView.vue'
 import RecordsView from './views/RecordsView.vue'
 import ProfileView from './views/ProfileView.vue'
+import InAppReminders from './components/medication/InAppReminders.vue'
+import { useMedicationReminders } from './composables/useMedicationReminders'
+
+// Start the due-time reminder engine (browser notification + in-app fallback).
+useMedicationReminders().start()
 
 type ViewName = 'home' | 'members' | 'medicines' | 'medication' | 'records' | 'profile'
 
@@ -56,6 +61,7 @@ const activeView = computed(() => views[currentView.value])
       <component :is="activeView" />
     </main>
   </div>
+  <InAppReminders />
 </template>
 
 <style scoped>
